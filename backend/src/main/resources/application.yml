@@ -1,0 +1,40 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/petdb}
+    username: ${SPRING_DATASOURCE_USERNAME:pet}
+    password: ${SPRING_DATASOURCE_PASSWORD:pet}
+  jpa:
+    hibernate:
+      ddl-auto: update
+      show-sql: true
+      format_sql: true
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      jdbc:
+        batch_size: 25
+        fetch_size: 50
+    open-in-view: false
+    properties:
+      hibernate:
+        generate_statistics: false
+        order_inserts: true
+        order_updates: true
+        connection:
+          provider_disables_autocommit: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: 6379
+jwt:
+  secret: "l4yk6uw/AYsGQOLnjnpck4/xkMyHyXSll6dxQ1IWqHg="
+  accessMinutes: 15
+  refreshDays: 14
+springdoc:
+  api-docs.enabled: true
+  swagger-ui.enabled: true

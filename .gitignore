@@ -1,0 +1,6 @@
+/devfile.yaml
+/qodana.yaml
+/.idea
+/backend/.idea
+/backend/target
+/frontend/node_modules

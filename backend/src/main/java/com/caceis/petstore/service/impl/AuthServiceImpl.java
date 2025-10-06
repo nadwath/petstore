@@ -51,4 +51,10 @@ public class AuthServiceImpl implements AuthService {
 
         return new Tokens(pair.accessToken(), pair.refreshToken());
     }
+
+    @Override
+    public void logout(String accessToken) {
+        Claims c = jwt.parse(accessToken).getBody();
+        allow.revoke(c.getId());
+    }
 }

@@ -62,13 +62,6 @@ public class UserController {
         }
     }
 
-    @GetMapping("/logout")
-    public ResponseEntity<Void> logout() {
-        // Logout logic would typically invalidate token
-        // For now, returning success
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/{username}")
     public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
         try {

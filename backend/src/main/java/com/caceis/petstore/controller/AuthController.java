@@ -2,8 +2,8 @@ package com.caceis.petstore.controller;
 
 import com.caceis.petstore.dto.LoginRequestDTO;
 import com.caceis.petstore.dto.RefreshTokenRequestDTO;
-import com.caceis.petstore.service.impl.AuthServiceImpl;
-import com.caceis.petstore.service.impl.RsaKeyServiceImpl;
+import com.caceis.petstore.service.AuthService;
+import com.caceis.petstore.service.RsaKeyService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,10 +15,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-    private final AuthServiceImpl auth;
-    private final RsaKeyServiceImpl rsa;
+    private final AuthService auth;
+    private final RsaKeyService rsa;
 
-    public AuthController(AuthServiceImpl auth, RsaKeyServiceImpl rsa) {
+    public AuthController(AuthService auth, RsaKeyService rsa) {
         this.auth = auth;
         this.rsa = rsa;
     }
@@ -45,7 +45,9 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
-        return ResponseEntity.ok(Map.of("ok", true));
+    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        auth.logout(token);
+        return ResponseEntity.ok().build();
     }
 }

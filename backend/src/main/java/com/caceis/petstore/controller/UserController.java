@@ -44,31 +44,6 @@ public class UserController {
                 .body(ObjectMapperUtils.mapList(created, UserDTO.class));
     }
 
-    @GetMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(
-            @RequestParam String username,
-            @RequestParam String password) {
-        try {
-            AuthServiceImpl.Tokens tokens = authService.login(username, password);
-            LoginResponseDTO response = LoginResponseDTO.builder()
-                    .accessToken(tokens.accessToken())
-                    .refreshToken(tokens.refreshToken())
-                    .tokenType("Bearer")
-                    .expiresIn(3600L)
-                    .build();
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
-
-    @GetMapping("/logout")
-    public ResponseEntity<Void> logout() {
-        // Logout logic would typically invalidate token
-        // For now, returning success
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/{username}")
     public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
         try {

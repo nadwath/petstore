@@ -2,13 +2,12 @@ package com.caceis.petstore.controller;
 
 import com.caceis.petstore.domain.User;
 import com.caceis.petstore.dto.*;
-import com.caceis.petstore.service.impl.AuthServiceImpl;
-import com.caceis.petstore.service.impl.UserServiceImpl;
+import com.caceis.petstore.service.AuthService;
+import com.caceis.petstore.service.UserService;
 import com.caceis.petstore.util.ObjectMapperUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,63 +16,49 @@ import java.util.List;
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserServiceImpl userService;
-    private final AuthServiceImpl authService;
+    private final UserService userService;
+    private final AuthService authService;
 
     @PostMapping
-    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody CreateUserDTO dto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserDTO createUser(@Valid @RequestBody CreateUserDTO dto) {
         User user = ObjectMapperUtils.mapObject(dto, User.class);
         User created = userService.create(user);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ObjectMapperUtils.mapObject(created, UserDTO.class));
+        return ObjectMapperUtils.mapObject(created, UserDTO.class);
     }
 
     @PostMapping("/createWithArray")
-    public ResponseEntity<List<UserDTO>> createUsersWithArray(@Valid @RequestBody List<CreateUserDTO> dtos) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<UserDTO> createUsersWithArray(@Valid @RequestBody List<CreateUserDTO> dtos) {
         List<User> users = ObjectMapperUtils.mapList(dtos, User.class);
         List<User> created = userService.createWithList(users);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ObjectMapperUtils.mapList(created, UserDTO.class));
+        return ObjectMapperUtils.mapList(created, UserDTO.class);
     }
 
     @PostMapping("/createWithList")
-    public ResponseEntity<List<UserDTO>> createUsersWithList(@Valid @RequestBody List<CreateUserDTO> dtos) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<UserDTO> createUsersWithList(@Valid @RequestBody List<CreateUserDTO> dtos) {
         List<User> users = ObjectMapperUtils.mapList(dtos, User.class);
         List<User> created = userService.createWithList(users);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ObjectMapperUtils.mapList(created, UserDTO.class));
+        return ObjectMapperUtils.mapList(created, UserDTO.class);
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
-        try {
-            User user = userService.getByUsername(username);
-            return ResponseEntity.ok(ObjectMapperUtils.mapObject(user, UserDTO.class));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    public UserDTO getUserByUsername(@PathVariable String username) {
+        User user = userService.getByUsername(username);
+        return ObjectMapperUtils.mapObject(user, UserDTO.class);
     }
 
     @PutMapping("/{username}")
-    public ResponseEntity<UserDTO> updateUser(
-            @PathVariable String username,
-            @Valid @RequestBody UpdateUserDTO dto) {
-        try {
-            User patch = ObjectMapperUtils.mapObject(dto, User.class);
-            User updated = userService.update(username, patch);
-            return ResponseEntity.ok(ObjectMapperUtils.mapObject(updated, UserDTO.class));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    public UserDTO updateUser(@PathVariable String username, @Valid @RequestBody UpdateUserDTO dto) {
+        User patch = ObjectMapperUtils.mapObject(dto, User.class);
+        User updated = userService.update(username, patch);
+        return ObjectMapperUtils.mapObject(updated, UserDTO.class);
     }
 
     @DeleteMapping("/{username}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String username) {
-        try {
-            userService.delete(username);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUser(@PathVariable String username) {
+        userService.delete(username);
     }
 }

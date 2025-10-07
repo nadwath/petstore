@@ -4,10 +4,11 @@ import com.caceis.petstore.domain.Pet;
 import com.caceis.petstore.dto.CreatePetDTO;
 import com.caceis.petstore.dto.PetDTO;
 import com.caceis.petstore.dto.UpdatePetDTO;
-import com.caceis.petstore.service.impl.PetServiceImpl;
+import com.caceis.petstore.service.PetService;
 import com.caceis.petstore.util.ObjectMapperUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
 @RequestMapping("/api/pet")
 @RequiredArgsConstructor
 public class PetController {
-    private final PetServiceImpl svc;
+    private final PetService svc;
 
     @GetMapping
     public List<PetDTO> list() {
@@ -34,6 +35,7 @@ public class PetController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public PetDTO create(@Valid @RequestBody CreatePetDTO dto) {
         Pet pet = ObjectMapperUtils.mapObject(dto, Pet.class);
         return ObjectMapperUtils.mapObject(svc.create(pet), PetDTO.class);
@@ -46,6 +48,7 @@ public class PetController {
     }
 
     @DeleteMapping("/{petId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long petId) {
         svc.delete(petId);
     }

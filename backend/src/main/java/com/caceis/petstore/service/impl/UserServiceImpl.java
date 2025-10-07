@@ -1,6 +1,7 @@
 package com.caceis.petstore.service.impl;
 
 import com.caceis.petstore.domain.User;
+import com.caceis.petstore.exception.ResourceNotFoundException;
 import com.caceis.petstore.repo.UserRepo;
 import com.caceis.petstore.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getByUsername(String username) {
         return repo.findByUsername(username).orElseThrow(() ->
-                new RuntimeException("User not found"));
+                new ResourceNotFoundException("User not found"));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.caceis.petstore.advice;
 
 import com.caceis.petstore.common.ApiResponse;
+import com.caceis.petstore.exception.PetStoreRequestException;
 import com.caceis.petstore.exception.ResourceNotFoundException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -56,6 +57,13 @@ public class ErrorHandler {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(ApiResponse.error(HttpStatus.NOT_FOUND.value(), ex.getMessage()));
+    }
+
+    @ExceptionHandler(PetStoreRequestException.class)
+    public ResponseEntity<ApiResponse<Void>> handlePetStoreRequestException(PetStoreRequestException ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ApiResponse.error(HttpStatus.UNPROCESSABLE_ENTITY.value(), ex.getMessage()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

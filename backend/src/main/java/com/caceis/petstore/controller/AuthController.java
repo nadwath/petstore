@@ -36,6 +36,7 @@ public class AuthController {
         cipher.init(Cipher.DECRYPT_MODE, priv);
         byte[] plain = cipher.doFinal(Base64.getDecoder().decode(req.getEncryptedPassword()));
         var tokens = auth.login(req.getUsername(), new String(plain));
+
         return ResponseEntity.ok(tokens);
     }
 

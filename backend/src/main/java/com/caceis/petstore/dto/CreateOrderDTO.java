@@ -19,15 +19,12 @@ public class CreateOrderDTO {
     private Long petId;
     
     @NotNull
-    @Min(1)
+    @Min(value = 1, message = "Minimum order quantity must be at least 1")
     private Integer quantity;
-    
-    @NotNull
+
     private LocalDateTime shipDate;
     
-    @NotNull
     private OrderStatus status;
     
-    @NotNull
     private Boolean complete;
 }

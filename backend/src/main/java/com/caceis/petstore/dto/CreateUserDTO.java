@@ -14,13 +14,13 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class CreateUserDTO {
-    @NotBlank
+    @NotBlank(message = "Username required")
     private String username;
     private String firstName;
     private String lastName;
-    @Email
+    @Email(message = "Invalid email address")
     private String email;
-    @NotBlank
+    @NotBlank(message = "Password required")
     private String password;
     private String phone;
     private Integer userStatus;

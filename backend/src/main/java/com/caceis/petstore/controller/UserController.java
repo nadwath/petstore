@@ -8,6 +8,7 @@ import com.caceis.petstore.util.ObjectMapperUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class UserController {
 
     @PostMapping("/createWithArray")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserDTO> createUsersWithArray(@Valid @RequestBody List<CreateUserDTO> dtos) {
         List<User> users = ObjectMapperUtils.mapList(dtos, User.class);
         List<User> created = userService.createWithList(users);
@@ -37,6 +39,7 @@ public class UserController {
 
     @PostMapping("/createWithList")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserDTO> createUsersWithList(@Valid @RequestBody List<CreateUserDTO> dtos) {
         List<User> users = ObjectMapperUtils.mapList(dtos, User.class);
         List<User> created = userService.createWithList(users);
@@ -44,12 +47,21 @@ public class UserController {
     }
 
     @GetMapping("/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
     public UserDTO getUserByUsername(@PathVariable String username) {
         User user = userService.getByUsername(username);
         return ObjectMapperUtils.mapObject(user, UserDTO.class);
     }
 
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<UserDTO> getAllUsers() {
+        List<User> users = userService.getAll();
+        return ObjectMapperUtils.mapList(users, UserDTO.class);
+    }
+
     @PutMapping("/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
     public UserDTO updateUser(@PathVariable String username, @Valid @RequestBody UpdateUserDTO dto) {
         User patch = ObjectMapperUtils.mapObject(dto, User.class);
         User updated = userService.update(username, patch);
@@ -58,6 +70,7 @@ public class UserController {
 
     @DeleteMapping("/{username}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(@PathVariable String username) {
         userService.delete(username);
     }

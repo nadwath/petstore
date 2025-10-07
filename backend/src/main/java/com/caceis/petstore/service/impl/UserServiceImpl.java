@@ -24,6 +24,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> getAll() {
+        return repo.findAll();
+    }
+
+    @Override
     public User getByUsername(String username) {
         return repo.findByUsername(username).orElseThrow(() ->
                 new ResourceNotFoundException("User not found"));

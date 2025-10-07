@@ -9,4 +9,6 @@ public interface OrderService {
     Order placeOrder(Order order);
     Order getOrder(Long orderId);
     void deleteOrder(Long orderId);
+    Order cancelOrder(Long orderId);
+    Order approveOrder(Long orderId);
 }

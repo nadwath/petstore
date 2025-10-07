@@ -1,7 +1,9 @@
 package com.caceis.petstore.service.impl;
 
+import com.caceis.petstore.common.PetStatus;
 import com.caceis.petstore.domain.Pet;
 import com.caceis.petstore.repo.PetRepo;
+import com.caceis.petstore.service.InventoryService;
 import com.caceis.petstore.service.PetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.*;
@@ -14,6 +16,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class PetServiceImpl implements PetService {
     private final PetRepo repo;
+    private final InventoryService inventoryService;
 
     @Override
     @Cacheable(cacheNames = "pets")
@@ -35,9 +38,20 @@ public class PetServiceImpl implements PetService {
 
     @Override
     @Transactional
-    @CacheEvict(cacheNames = {"pets", "petsByStatus"}, allEntries = true)
+    @CacheEvict(cacheNames = {"pets", "petsByStatus", "inventory"}, allEntries = true)
     public Pet create(Pet p) {
-        return repo.save(p);
+        // Set pet status to AVAILABLE by default
+        if (p.getStatus() == null) {
+            p.setStatus(PetStatus.AVAILABLE);
+        }
+
+        // Save pet first
+        Pet savedPet = repo.save(p);
+
+        // Create inventory with initial stock of 1
+        inventoryService.createInventory(savedPet.getId(), 1);
+
+        return savedPet;
     }
 
     @Override

@@ -9,6 +9,7 @@ import com.caceis.petstore.util.ObjectMapperUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,12 +37,14 @@ public class PetController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public PetDTO create(@Valid @RequestBody CreatePetDTO dto) {
         Pet pet = ObjectMapperUtils.mapObject(dto, Pet.class);
         return ObjectMapperUtils.mapObject(svc.create(pet), PetDTO.class);
     }
 
     @PutMapping("/{petId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public PetDTO update(@PathVariable Long petId, @Valid @RequestBody UpdatePetDTO dto) {
         Pet pet = ObjectMapperUtils.mapObject(dto, Pet.class);
         return ObjectMapperUtils.mapObject(svc.update(petId, pet), PetDTO.class);
@@ -49,6 +52,7 @@ public class PetController {
 
     @DeleteMapping("/{petId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable Long petId) {
         svc.delete(petId);
     }

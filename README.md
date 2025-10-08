@@ -52,11 +52,8 @@ docker compose up --build
 | SPRING_REDIS_HOST | redis | Redis host |
 | JWT_SECRET | in `application.yml` | HMAC key (change in prod) |
 
-## Test
-```bash
-cd backend
-./mvnw test || mvn test
-```
+## User
+- User: **admin** | password: **admin**
 
 ## License
 MIT © 2025 Petstore Contributors

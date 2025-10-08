@@ -2,26 +2,28 @@ package com.caceis.petstore.controller;
 
 import com.caceis.petstore.dto.LoginRequestDTO;
 import com.caceis.petstore.dto.RefreshTokenRequestDTO;
-import com.caceis.petstore.service.impl.AuthServiceImpl;
-import com.caceis.petstore.service.impl.RsaKeyServiceImpl;
-import org.springframework.http.ResponseEntity;
+import com.caceis.petstore.service.AuthService;
+import com.caceis.petstore.service.RsaKeyService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.util.Base64;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
-    private final AuthServiceImpl auth;
-    private final RsaKeyServiceImpl rsa;
-
-    public AuthController(AuthServiceImpl auth, RsaKeyServiceImpl rsa) {
-        this.auth = auth;
-        this.rsa = rsa;
-    }
+    private final AuthService auth;
+    private final RsaKeyService rsa;
 
     @GetMapping("/public-key")
     public Map<String, String> pub() {
@@ -30,22 +32,28 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDTO req) throws Exception {
+    public AuthService.Tokens login(@RequestBody LoginRequestDTO req) throws Exception {
         Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
         PrivateKey priv = rsa.getPrivateKey();
-        cipher.init(Cipher.DECRYPT_MODE, priv);
+
+        java.security.spec.MGF1ParameterSpec mgf1 = new java.security.spec.MGF1ParameterSpec("SHA-256");
+        javax.crypto.spec.OAEPParameterSpec oaepParams = new javax.crypto.spec.OAEPParameterSpec(
+            "SHA-256", "MGF1", mgf1, javax.crypto.spec.PSource.PSpecified.DEFAULT);
+
+        cipher.init(Cipher.DECRYPT_MODE, priv, oaepParams);
         byte[] plain = cipher.doFinal(Base64.getDecoder().decode(req.getEncryptedPassword()));
-        var tokens = auth.login(req.getUsername(), new String(plain));
-        return ResponseEntity.ok(tokens);
+        return auth.login(req.getUsername(), new String(plain));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@RequestBody RefreshTokenRequestDTO req) {
-        return ResponseEntity.ok(auth.refresh(req.getRefreshToken()));
+    public AuthService.Tokens refresh(@RequestBody RefreshTokenRequestDTO req) {
+        return auth.refresh(req.getRefreshToken());
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
-        return ResponseEntity.ok(Map.of("ok", true));
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        auth.logout(token);
     }
 }

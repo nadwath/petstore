@@ -1,0 +1,7 @@
+package com.caceis.petstore.exception;
+
+public class PetStoreRequestException extends RuntimeException {
+    public PetStoreRequestException(String message) {
+        super(message);
+    }
+}

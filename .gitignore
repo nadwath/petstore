@@ -3,4 +3,8 @@
 /.idea
 /backend/.idea
 /backend/target
+/backend/.iml
+/backend/.classpath
 /frontend/node_modules
+/frontend/.idea
+/frontend/.angular

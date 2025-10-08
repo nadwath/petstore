@@ -14,7 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class CreatePetDTO {
-    @NotBlank
+    @NotBlank(message = "Name required")
     private String name;
     private CategoryDTO category;
     private Set<String> photoUrls;

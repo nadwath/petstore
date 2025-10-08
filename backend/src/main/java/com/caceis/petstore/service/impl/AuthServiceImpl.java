@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.HashSet;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,12 @@ public class AuthServiceImpl implements AuthService {
         if (!encoder.matches(rawPassword, u.getPassword()))
             throw new BadCredentialsException("Username or password is incorrect!");
 
-        var pair = jwt.issue(u.getUsername(), u.getRights());
+        // Combine roles and rights for authorities
+        var authorities = new HashSet<String>();
+        authorities.addAll(u.getRights());
+        u.getRoles().forEach(role -> authorities.add("ROLE_" + role.getName()));
+
+        var pair = jwt.issue(u.getUsername(), authorities);
         Claims c = jwt.parse(pair.accessToken()).getBody();
         allow.allow(c.getId(), Duration.between(c.getIssuedAt().toInstant(), c.getExpiration().toInstant()));
 
@@ -45,10 +51,22 @@ public class AuthServiceImpl implements AuthService {
 
         String username = c.getSubject();
         var u = users.findByUsername(username).orElseThrow();
-        var pair = jwt.issue(u.getUsername(), u.getRights());
+
+        // Combine roles and rights for authorities
+        var authorities = new HashSet<String>();
+        authorities.addAll(u.getRights());
+        u.getRoles().forEach(role -> authorities.add("ROLE_" + role.getName()));
+
+        var pair = jwt.issue(u.getUsername(), authorities);
         Claims ac = jwt.parse(pair.accessToken()).getBody();
         allow.allow(ac.getId(), Duration.between(ac.getIssuedAt().toInstant(), ac.getExpiration().toInstant()));
 
         return new Tokens(pair.accessToken(), pair.refreshToken());
+    }
+
+    @Override
+    public void logout(String accessToken) {
+        Claims c = jwt.parse(accessToken).getBody();
+        allow.revoke(c.getId());
     }
 }

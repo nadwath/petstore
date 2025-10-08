@@ -38,7 +38,7 @@ public class JwtServiceImpl implements JwtService {
         String access = Jwts.builder()
                 .setId(jti)
                 .setSubject(username)
-                .claim("rights", rights)
+                .claim("authorities", rights)
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(accessExp))
                 .signWith(key, SignatureAlgorithm.HS256)

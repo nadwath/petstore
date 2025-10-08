@@ -1,8 +1,10 @@
 package com.caceis.petstore.controller;
 
+import com.caceis.petstore.common.UserRole;
 import com.caceis.petstore.domain.Role;
 import com.caceis.petstore.domain.User;
 import com.caceis.petstore.dto.*;
+import com.caceis.petstore.exception.PetStoreRequestException;
 import com.caceis.petstore.repo.RoleRepo;
 import com.caceis.petstore.service.AuthService;
 import com.caceis.petstore.service.UserService;
@@ -30,15 +32,11 @@ public class UserController {
     public UserDTO createUser(@Valid @RequestBody CreateUserDTO dto) {
         User user = ObjectMapperUtils.mapObject(dto, User.class);
 
-        // Map role names to Role entities
-        if (dto.getRoleIds() != null && !dto.getRoleIds().isEmpty()) {
-            Set<Role> roles = new HashSet<>();
-            for (String roleName : dto.getRoleIds()) {
-                roleRepo.findByName(roleName).ifPresent(roles::add);
-            }
-            user.setRoles(roles);
-        }
+        dto.getRoleIds().forEach(roleId -> {
+            roleRepo.findById(roleId).orElseThrow(() -> new PetStoreRequestException("Invalid role"));
+        });
 
+        user.setPassword(dto.getPassword());
         User created = userService.create(user);
         return ObjectMapperUtils.mapObject(created, UserDTO.class);
     }
@@ -49,17 +47,11 @@ public class UserController {
     public List<UserDTO> createUsersWithArray(@Valid @RequestBody List<CreateUserDTO> dtos) {
         List<User> users = ObjectMapperUtils.mapList(dtos, User.class);
 
-        // Map role names to Role entities for each user
-        for (int i = 0; i < dtos.size(); i++) {
-            CreateUserDTO dto = dtos.get(i);
-            if (dto.getRoleIds() != null && !dto.getRoleIds().isEmpty()) {
-                Set<Role> roles = new HashSet<>();
-                for (String roleName : dto.getRoleIds()) {
-                    roleRepo.findByName(roleName).ifPresent(roles::add);
-                }
-                users.get(i).setRoles(roles);
-            }
-        }
+        dtos.forEach(dto -> {
+            dto.getRoleIds().forEach(roleId -> {
+                roleRepo.findById(roleId).orElseThrow(() -> new PetStoreRequestException("Invalid role"));
+            });
+        });
 
         List<User> created = userService.createWithList(users);
         return ObjectMapperUtils.mapList(created, UserDTO.class);
@@ -71,17 +63,11 @@ public class UserController {
     public List<UserDTO> createUsersWithList(@Valid @RequestBody List<CreateUserDTO> dtos) {
         List<User> users = ObjectMapperUtils.mapList(dtos, User.class);
 
-        // Map role names to Role entities for each user
-        for (int i = 0; i < dtos.size(); i++) {
-            CreateUserDTO dto = dtos.get(i);
-            if (dto.getRoleIds() != null && !dto.getRoleIds().isEmpty()) {
-                Set<Role> roles = new HashSet<>();
-                for (String roleName : dto.getRoleIds()) {
-                    roleRepo.findByName(roleName).ifPresent(roles::add);
-                }
-                users.get(i).setRoles(roles);
-            }
-        }
+        dtos.forEach(dto -> {
+            dto.getRoleIds().forEach(roleId -> {
+                roleRepo.findById(roleId).orElseThrow(() -> new PetStoreRequestException("Invalid role"));
+            });
+        });
 
         List<User> created = userService.createWithList(users);
         return ObjectMapperUtils.mapList(created, UserDTO.class);
@@ -105,6 +91,11 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public UserDTO updateUser(@PathVariable String username, @Valid @RequestBody UpdateUserDTO dto) {
         User patch = ObjectMapperUtils.mapObject(dto, User.class);
+
+        dto.getRoleIds().forEach(roleId -> {
+            roleRepo.findById(roleId).orElseThrow(() -> new PetStoreRequestException("Invalid role"));
+        });
+
         User updated = userService.update(username, patch);
         return ObjectMapperUtils.mapObject(updated, UserDTO.class);
     }

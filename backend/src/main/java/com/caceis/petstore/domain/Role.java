@@ -11,7 +11,6 @@ import lombok.*;
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @com.fasterxml.jackson.annotation.JsonIgnore
     private Long id;
 
     @Column(unique = true, nullable = false)

@@ -1,16 +1,17 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { UserService, User } from '../../core/services/user.service';
+import { RoleService, Role } from '../../core/services/role.service';
 
 @Component({
   selector: 'app-create-user',
   templateUrl: './create-user.component.html'
 })
-export class CreateUserComponent {
+export class CreateUserComponent implements OnInit {
   @Output() userCreated = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
 
-  roles = ['ADMIN', 'USER'];
-  selectedRoles: string[] = [];
+  roles: Role[] = [];
+  selectedRoles: number[] = [];
 
   newUser: User = {
     username: '',
@@ -24,14 +25,25 @@ export class CreateUserComponent {
   };
 
   constructor(
-    private userService: UserService
+    private userService: UserService,
+    private roleService: RoleService
   ) {}
 
-  onRoleChange(role: string, event: any) {
+  ngOnInit() {
+    this.loadRoles();
+  }
+
+  loadRoles() {
+    this.roleService.list().subscribe(roles => {
+      this.roles = roles;
+    });
+  }
+
+  onRoleChange(roleId: number, event: any) {
     if (event.target.checked) {
-      this.selectedRoles.push(role);
+      this.selectedRoles.push(roleId);
     } else {
-      const index = this.selectedRoles.indexOf(role);
+      const index = this.selectedRoles.indexOf(roleId);
       if (index > -1) {
         this.selectedRoles.splice(index, 1);
       }
@@ -52,7 +64,7 @@ export class CreateUserComponent {
       return;
     }
 
-    this.newUser.roleIds = this.selectedRoles as any;
+    this.newUser.roleIds = this.selectedRoles;
 
     this.userService.create(this.newUser).subscribe({
       next: () => {

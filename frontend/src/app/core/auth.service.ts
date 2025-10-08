@@ -18,6 +18,16 @@ export class AuthService {
     return localStorage.getItem('rt');
   }
 
+  isAdmin(): boolean {
+    if (!this.at) return false;
+    try {
+      const payload = JSON.parse(atob(this.at.split('.')[1]));
+      return payload.authorities?.includes('ROLE_ADMIN') || false;
+    } catch {
+      return false;
+    }
+  }
+
   getPublicKey() {
     return this.http.get<any>(`${this.baseUrl}/public-key`);
   }

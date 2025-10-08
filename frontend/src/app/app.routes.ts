@@ -16,6 +16,6 @@ export const APP_ROUTES: Routes = [
         canActivate: [AuthGuard]
     },
     {
-        path: '', pathMatch: 'full', redirectTo: 'pets'
+        path: '', pathMatch: 'full', redirectTo: 'auth'
     }
 ];

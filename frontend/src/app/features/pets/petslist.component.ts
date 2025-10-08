@@ -56,7 +56,7 @@ export class PetsListComponent implements OnInit {
   }
 
   isAdmin(): boolean {
-    return !!this.authService.accessToken();
+    return this.authService.isAdmin();
   }
 
   toggleCreateForm() {

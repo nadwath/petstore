@@ -42,9 +42,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 if (allow.isAllowed(jti)) {
                     String user = c.getSubject();
-                    var rights = (List<String>) c.get("rights");
-                    List<SimpleGrantedAuthority> authorities = rights == null ? List.of() : rights.stream().map(SimpleGrantedAuthority::new).toList();
-                    var auth = new UsernamePasswordAuthenticationToken(user, null, authorities);
+                    var authorities = (List<String>) c.get("authorities");
+                    List<SimpleGrantedAuthority> grantedAuthorities = authorities == null ? List.of() : authorities.stream().map(SimpleGrantedAuthority::new).toList();
+                    var auth = new UsernamePasswordAuthenticationToken(user, null, grantedAuthorities);
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             } catch (Exception ex) {

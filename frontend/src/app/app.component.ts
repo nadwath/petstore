@@ -18,7 +18,7 @@ import { Router } from '@angular/router';
           <li class="nav-item" *ngIf="isLoggedIn()">
             <a class="nav-link" routerLink="/pets" routerLinkActive="active">Pets</a>
           </li>
-          <li class="nav-item" *ngIf="isLoggedIn()">
+          <li class="nav-item" *ngIf="isLoggedIn() && isAdmin()">
             <a class="nav-link" routerLink="/users" routerLinkActive="active">Users</a>
           </li>
           <li class="nav-item" *ngIf="!isLoggedIn()">
@@ -40,6 +40,10 @@ export class AppComponent {
 
   isLoggedIn(): boolean {
     return !!this.auth.accessToken();
+  }
+
+  isAdmin(): boolean {
+    return this.auth.isAdmin();
   }
 
   logout(): void {

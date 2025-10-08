@@ -87,8 +87,7 @@ CREATE TABLE IF NOT EXISTS orders (
 
 -- Roles
 INSERT INTO roles(name) VALUES ('ADMIN') ON CONFLICT DO NOTHING;
-INSERT INTO roles(name) VALUES ('EDITOR') ON CONFLICT DO NOTHING;
-INSERT INTO roles(name) VALUES ('VIEWER') ON CONFLICT DO NOTHING;
+INSERT INTO roles(name) VALUES ('USER') ON CONFLICT DO NOTHING;
 
 -- Admin user
 INSERT INTO users(username, password_hash, enabled, email, first_name, last_name, phone, user_status)

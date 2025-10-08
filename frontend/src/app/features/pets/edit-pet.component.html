@@ -1,0 +1,53 @@
+<div class="card mb-4">
+  <div class="card-header">
+    <h5 class="mb-0">Edit Pet: {{pet.name}}</h5>
+  </div>
+  <div class="card-body">
+    <form (ngSubmit)="updatePet()">
+      <div class="mb-3">
+        <label class="form-label">Pet Name *</label>
+        <input type="text" class="form-control" [(ngModel)]="editPet.name" name="name" required>
+      </div>
+      
+      <div class="mb-3">
+        <label class="form-label">Category</label>
+        <select class="form-select" [(ngModel)]="editPet.categoryId" name="categoryId">
+          <option [ngValue]="null">-- Select Category --</option>
+          <option *ngFor="let category of categories" [ngValue]="category.id">
+            {{category.name}}
+          </option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Status</label>
+        <select class="form-select" [(ngModel)]="editPet.status" name="status">
+          <option value="AVAILABLE">Available</option>
+          <option value="PENDING">Pending</option>
+          <option value="SOLD">Sold</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Tags</label>
+        <div class="form-check" *ngFor="let tag of tags">
+          <input 
+            class="form-check-input" 
+            type="checkbox" 
+            [id]="'edit-tag-' + tag.id"
+            [value]="tag.id"
+            [checked]="isTagSelected(tag.id)"
+            (change)="onTagChange(tag.id, $event)">
+          <label class="form-check-label" [for]="'edit-tag-' + tag.id">
+            {{tag.name}}
+          </label>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Update Pet</button>
+        <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>

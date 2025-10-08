@@ -24,5 +24,5 @@ public class CreateUserDTO {
     private String password;
     private String phone;
     private Integer userStatus;
-    private Set<Long> roleIds;
+    private Set<String> roleIds;
 }

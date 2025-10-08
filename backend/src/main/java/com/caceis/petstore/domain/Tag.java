@@ -1,5 +1,6 @@
 package com.caceis.petstore.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,5 +23,6 @@ public class Tag {
 
     @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)
     @Builder.Default
+    @JsonIgnore
     private Set<Pet> pets = new HashSet<>();
 }

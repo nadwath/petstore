@@ -33,6 +33,7 @@ public class User {
     private String email;
 
     @Column(name = "password_hash", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private String password; // store hashed password
 
     @Column(name = "phone")

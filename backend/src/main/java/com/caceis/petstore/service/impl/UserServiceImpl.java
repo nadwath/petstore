@@ -1,11 +1,11 @@
 package com.caceis.petstore.service.impl;
 
 import com.caceis.petstore.domain.User;
+import com.caceis.petstore.exception.PetStoreRequestException;
 import com.caceis.petstore.exception.ResourceNotFoundException;
 import com.caceis.petstore.repo.UserRepo;
 import com.caceis.petstore.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +23,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> getAll() {
+        return repo.findAll();
+    }
+
+    @Override
     public User getByUsername(String username) {
         return repo.findByUsername(username).orElseThrow(() ->
                 new ResourceNotFoundException("User not found"));
@@ -30,10 +35,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    @CacheEvict(cacheNames = "setup", allEntries = true)
     public User create(User user) {
         if (repo.findByUsername(user.getUsername()).isPresent()) {
-            throw new RuntimeException("Username already exists");
+            throw new PetStoreRequestException("Username already exists");
         }
         user.setPassword(encoder.encode(user.getPassword()));
         return repo.save(user);
@@ -41,7 +45,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    @CacheEvict(cacheNames = "setup", allEntries = true)
     public List<User> createWithList(List<User> users) {
         for (User user : users) {
             user.setPassword(encoder.encode(user.getPassword()));
@@ -51,7 +54,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    @CacheEvict(cacheNames = "setup", allEntries = true)
     public User update(String username, User patch) {
         User user = getByUsername(username);
 
@@ -75,7 +77,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    @CacheEvict(cacheNames = "setup", allEntries = true)
     public void delete(String username) {
         User user = getByUsername(username);
         repo.delete(user);

@@ -9,7 +9,6 @@ import com.caceis.petstore.repo.OrderRepo;
 import com.caceis.petstore.service.InventoryService;
 import com.caceis.petstore.service.OrderService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +23,6 @@ public class OrderServiceImpl implements OrderService {
     private final InventoryService inventoryService;
 
     @Override
-    @Cacheable(cacheNames = "orderInventory")
     public Map<String, Long> getInventory() {
         var results = repo.getInventory();
         Map<String, Long> inventory = new HashMap<>();
@@ -40,7 +38,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    @CacheEvict(cacheNames = {"orders", "orderInventory", "inventory"}, allEntries = true)
     public Order placeOrder(Order order) {
         // Validate order quantity
         if (order.getQuantity() == null || order.getQuantity() < 1) {
@@ -59,7 +56,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Cacheable(cacheNames = "orders", key = "#orderId")
     public Order getOrder(Long orderId) {
         return repo.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
@@ -67,7 +63,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    @CacheEvict(cacheNames = {"orders", "orderInventory", "inventory"}, allEntries = true)
     public Order cancelOrder(Long orderId) {
         Order order = repo.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
@@ -88,7 +83,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    @CacheEvict(cacheNames = {"orders", "orderInventory", "inventory"}, allEntries = true)
     public Order approveOrder(Long orderId) {
         Order order = repo.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
@@ -110,7 +104,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    @CacheEvict(cacheNames = {"orders", "orderInventory"}, allEntries = true)
     public void deleteOrder(Long orderId) {
         if (!repo.existsById(orderId)) {
             throw new ResourceNotFoundException("Order not found");

@@ -1,0 +1,33 @@
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h2 class="card-title text-center mb-4">Login</h2>
+
+        <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+          {{errorMessage}}
+          <button type="button" class="btn-close" (click)="errorMessage=''" aria-label="Close"></button>
+        </div>
+
+        <form (ngSubmit)="login()">
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input [(ngModel)]="u" name="u" id="username" type="text" class="form-control"
+                   placeholder="Enter username" required [disabled]="isLoading">
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input [(ngModel)]="p" name="p" id="password" type="password" class="form-control"
+                   placeholder="Enter password" required [disabled]="isLoading">
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              {{isLoading ? 'Logging in...' : 'Login'}}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

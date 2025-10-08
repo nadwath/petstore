@@ -24,12 +24,12 @@ public class Pet {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "pet_photos", joinColumns = @JoinColumn(name = "pet_id"))
     @Column(name = "photo_url")
     private Set<String> photoUrls;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "pet_tags",
             joinColumns = @JoinColumn(name = "pet_id"),

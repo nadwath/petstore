@@ -6,7 +6,6 @@ import com.caceis.petstore.exception.ResourceNotFoundException;
 import com.caceis.petstore.repo.UserRepo;
 import com.caceis.petstore.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

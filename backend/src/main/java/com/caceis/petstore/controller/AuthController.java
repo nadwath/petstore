@@ -4,24 +4,26 @@ import com.caceis.petstore.dto.LoginRequestDTO;
 import com.caceis.petstore.dto.RefreshTokenRequestDTO;
 import com.caceis.petstore.service.AuthService;
 import com.caceis.petstore.service.RsaKeyService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.util.Base64;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService auth;
     private final RsaKeyService rsa;
-
-    public AuthController(AuthService auth, RsaKeyService rsa) {
-        this.auth = auth;
-        this.rsa = rsa;
-    }
 
     @GetMapping("/public-key")
     public Map<String, String> pub() {
@@ -33,7 +35,12 @@ public class AuthController {
     public AuthService.Tokens login(@RequestBody LoginRequestDTO req) throws Exception {
         Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
         PrivateKey priv = rsa.getPrivateKey();
-        cipher.init(Cipher.DECRYPT_MODE, priv);
+
+        java.security.spec.MGF1ParameterSpec mgf1 = new java.security.spec.MGF1ParameterSpec("SHA-256");
+        javax.crypto.spec.OAEPParameterSpec oaepParams = new javax.crypto.spec.OAEPParameterSpec(
+            "SHA-256", "MGF1", mgf1, javax.crypto.spec.PSource.PSpecified.DEFAULT);
+
+        cipher.init(Cipher.DECRYPT_MODE, priv, oaepParams);
         byte[] plain = cipher.doFinal(Base64.getDecoder().decode(req.getEncryptedPassword()));
         return auth.login(req.getUsername(), new String(plain));
     }

@@ -6,7 +6,6 @@ import com.caceis.petstore.repo.PetRepo;
 import com.caceis.petstore.service.InventoryService;
 import com.caceis.petstore.service.PetService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,26 +18,22 @@ public class PetServiceImpl implements PetService {
     private final InventoryService inventoryService;
 
     @Override
-    @Cacheable(cacheNames = "pets")
     public List<Pet> list() {
         return repo.findAll();
     }
 
     @Override
-    @Cacheable(cacheNames = "pets", key = "#id")
     public Pet get(Long id) {
         return repo.findById(id).orElseThrow();
     }
 
     @Override
-    @Cacheable(cacheNames = "petsByStatus", key = "#status")
     public List<Pet> findByStatus(String status) {
         return repo.findByStatus(status);
     }
 
     @Override
     @Transactional
-    @CacheEvict(cacheNames = {"pets", "petsByStatus", "inventory"}, allEntries = true)
     public Pet create(Pet p) {
         // Set pet status to AVAILABLE by default
         if (p.getStatus() == null) {
@@ -56,13 +51,6 @@ public class PetServiceImpl implements PetService {
 
     @Override
     @Transactional
-    @Caching(
-        put = @CachePut(cacheNames = "pets", key = "#id"),
-        evict = {
-            @CacheEvict(cacheNames = "pets", allEntries = true),
-            @CacheEvict(cacheNames = "petsByStatus", allEntries = true)
-        }
-    )
     public Pet update(Long id, Pet patch) {
         Pet p = get(id);
         if (patch.getName() != null) p.setName(patch.getName());
@@ -74,7 +62,6 @@ public class PetServiceImpl implements PetService {
 
     @Override
     @Transactional
-    @CacheEvict(cacheNames = {"pets", "petsByStatus"}, allEntries = true)
     public void delete(Long id) {
         repo.deleteById(id);
     }

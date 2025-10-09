@@ -11,7 +11,7 @@ public class PetServiceTest {
   @Test void listUsesRepo(){
     PetRepo repo = mock(PetRepo.class);
     InventoryService inventoryService = mock(InventoryService.class);
-    when(repo.findAll()).thenReturn(List.of(Pet.builder().name("Scobby doo").status(PetStatus.AVAILABLE).build()));
+    when(repo.findAll()).thenReturn(List.of(Pet.builder().name("Scooby doo").status(PetStatus.AVAILABLE).build()));
     PetServiceImpl svc = new PetServiceImpl(repo, inventoryService);
     assert svc.list().size()==1;
   }
